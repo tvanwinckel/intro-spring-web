@@ -55,3 +55,9 @@ Spring Boot will provide you with certain features like metrics, health checks a
 ## Getting started with Spring boot
 
 The easiest way to get started with Spring boot is through the [Spring Initializr](https://start.spring.io/). You will be able to select a dependency manager, language, project metadata, ... and the Spring Boot version. In addition you can directly add several dependencies to your project.
+
+---
+
+## Sources
+
+* [Spring Boot Project](https://spring.io/projects/spring-boot)
