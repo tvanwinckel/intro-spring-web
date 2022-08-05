@@ -776,6 +776,138 @@ public class ExampleAdvice2 {}
 public class ExampleAdvice3 {}
 ```
 
+---
+
+## View Technologies
+
+The use of view technologies in Spring MVC is pluggable, whether you decide to use Thymeleaf, Groovy Markup Templates, JSPs, or other technologies, is primarily a matter of a configuration change.
+
+For this document we will be focussing on the Thymeleaf view technology.
+
+WHAT DO WE NEED TO DO TO GET STARTED WITH THYMELEAF
+
+```java
+
+Code examples for working with Thymeleaf
+
+```
+
+[Getting with Thymeleaf and Spring](https://spring.io/guides/gs/handling-form-submission/)
+[Creating a form](https://www.baeldung.com/spring-mvc-form-tutorial)
+
+---
+
+## Functional Endpoints
+
+TBD
+
+---
+
+## URI Links
+
+This section describes various options available in the Spring Framework to work with URI’s.
+
+### UriComponents
+
+`UriComponentsBuilder` helps to build URI’s from URI templates with variables, as the following example shows:
+
+```java
+UriComponents uriComponents = UriComponentsBuilder
+  .fromUriString("https://example.com/hotels/{hotel}")  
+  .queryParam("q", "{q}")  
+  .encode() 
+  .build(); 
+
+URI uri = uriComponents.expand("Westin", "123").toUri();  
+```
+
+1. Static factory method with a URI template.
+2. Add or replace URI components.
+3. Request to have the URI template and URI variables encoded.
+4. Build a UriComponents.
+5. Expand variables and obtain the URI.
+
+The example can be shortened to:
+
+```java
+URI uri = UriComponentsBuilder
+  .fromUriString("https://example.com/hotels/{hotel}")
+  .queryParam("q", "{q}")
+  .build("Westin", "123"); 
+
+Or even
+
+URI uri = UriComponentsBuilder
+  .fromUriString("https://example.com/hotels/{hotel}?q={q}")
+  .build("Westin", "123");
+```
+
+### UriBuilder
+
+`UriComponentsBuilder` implements `UriBuilder`. You can create a `UriBuilder`, in turn, with a `UriBuilderFactory`. Together, `UriBuilderFactory` and UriBuilder provide a pluggable mechanism to build URIs from URI templates, based on shared configuration, such as a base URL, encoding preferences, and other details.
+
+```java
+String baseUrl = "https://example.com";
+DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
+
+URI uri = uriBuilderFactory.uriString("/hotels/{hotel}")
+  .queryParam("q", "{q}")
+  .build("Westin", "123");
+```
+
+### UriEncoding
+
+UriComponentsBuilder exposes encoding options at two levels:
+
+* UriComponentsBuilder#encode(): Pre-encodes the URI template first and then strictly encodes URI variables when expanded.
+* UriComponents#encode(): Encodes URI components after URI variables are expanded.
+
+Both options replace non-ASCII and illegal characters with escaped octets. However, the first option also replaces characters with reserved meaning that appear in URI variables.
+
+The following example uses the first option:
+
+```java
+URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}")
+  .queryParam("q", "{q}")
+  .encode()
+  .buildAndExpand("New York", "foo+bar")
+  .toUri();
+
+OR
+
+URI uri = UriComponentsBuilder.fromPath("/hotel list/{city}?q={q}")
+  .build("New York", "foo+bar")
+
+// Result is "/hotel%20list/New%20York?q=foo%2Bbar"
+```
+
+You can also create URIs to your own controllers:
+
+```java
+@Controller
+@RequestMapping("/hotels/{hotel}")
+public class BookingController {
+
+    @GetMapping("/bookings/{booking}")
+    public ModelAndView getBooking(@PathVariable Long booking) {
+        // ...
+    }
+}
+
+
+
+UriComponents uriComponents = MvcUriComponentsBuilder
+    .fromMethodName(BookingController.class, "getBooking", 21).buildAndExpand(42);
+
+URI uri = uriComponents.encode().toUri();
+
+```
+
+---
+
+## Cors
+
+TBD
 
 ---
 
