@@ -290,7 +290,7 @@ public void afterCompletion(HttpServletRequest request, HttpServletResponse resp
 }
 ```
 
-### Exceptions
+### Exception Handling
 
 If an exception occurs during request mapping or is thrown from a request handler the `DispatcherServlet` delegates to a chain of `HandlerExceptionResolver` beans to resolve the exception and provide alternative handling, which is typically an error response.
 
@@ -527,11 +527,262 @@ public void findPet(@PathVariable String petId) {
 }
 ```
 
+### Handler Methods
+
+`@RequestMapping` handler methods have a flexible signature and can choose from a range of supported controller method arguments and return values.
+
+#### Method Arguments
+
+| Controller method argument | Description |
+| --- | --- |
+| @RequestParam | For access to the Servlet request parameters, including multipart files. Parameter values are converted to the declared method argument type. |
+| @RequestHeader | For access to request headers. Header values are converted to the declared method argument type. |
+| @RequestBody | For access to the HTTP request body. |
+| @ModelAttribute | For access to an existing attribute in the model (instantiated if not present) with data binding and validation applied. |
+| @PathVariable | For access to URI template variables. |
+| HttpMethod | The HTTP method of the request. |
+
+##### @RequestParam
+
+You can use the @RequestParam annotation to bind Servlet request parameters (that is, query parameters or form data) to a method argument in a controller.
+
+The following example shows how to do so:
+
+```java
+@Controller
+@RequestMapping("/pets")
+public class EditPetForm {
+
+ @GetMapping
+ public String setupForm(@RequestParam("petId") int petId, Model model) { 
+  Pet pet = this.clinic.loadPet(petId);
+  model.addAttribute("pet", pet);
+  return "petForm";
+ }
+}
+```
+
+By default, method parameters that use this annotation are required, but you can specify that a method parameter is optional by setting the `@RequestParam` annotation’s required flag to false or by declaring the argument with an java.util.Optional wrapper.
+
+##### @RequestHeader
+
+You can use the @RequestHeader annotation to bind a request header to a method argument in a controller.
+
+```txt
+Host                    localhost:8080
+Accept                  text/html,application/xhtml+xml,application/xml;q=0.9
+Accept-Language         fr,en-gb;q=0.7,en;q=0.3
+Accept-Encoding         gzip,deflate
+Accept-Charset          ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive              300
+```
+
+The following example gets the value of the Accept-Encoding and Keep-Alive headers:
+
+```java
+@GetMapping("/demo")
+public void handle(
+  @RequestHeader("Accept-Encoding") String encoding, 
+  @RequestHeader("Keep-Alive") long keepAlive) { 
+ //...
+}
+```
+
+##### @Requestbody
+
+You can use the @RequestBody annotation to have the request body read and deserialized into an Object through an HttpMessageConverter. The following example uses a @RequestBody argument:
+
+```java
+@PostMapping("/accounts")
+public void handle(@RequestBody Account account) {
+ // ...
+}
+```
+
+##### @ModelAttribute
+
+You can use the `@ModelAttribute` annotation on a method argument to access an attribute from the model or have it be instantiated if not present. The model attribute is also overlain with values from HTTP Servlet request parameters whose names match to field names. This is referred to as data binding, and it saves you from having to deal with parsing and converting individual query parameters and form fields.
+
+```java
+@PostMapping("/owners/{ownerId}/pets/{petId}/edit")
+public String processSubmit(@ModelAttribute Pet pet) { }
+```
+
+#### Return Values
+
+| Controller method return value | Description |
+| --- | --- |
+| @ResponseBody | The return value is converted through HttpMessageConverter implementations and written to the response. |
+| HttpEntity<B>, ResponseEntity<B> | The return value that specifies the full response (including HTTP headers and body) |
+| HttpHeaders | For returning a response with headers and no body. |
+| String | A view name to be resolved with ViewResolver implementations and used together with the implicit model. |
+| Model & View (ModelAndView) | The view and model attributes to use and, optionally, a response status. |
+
+##### @ResponseBody
+
+You can use the @ResponseBody annotation on a method to have the return serialized to the response body through an HttpMessageConverter. The following listing shows an example:
+
+```java
+@GetMapping("/accounts/{id}")
+@ResponseBody
+public Account handle() {
+ // ...
+}
+```
+
+##### HttpEntity
+
+HttpEntity is more or less identical to using mvc-ann-requestbody but is based on a container object that exposes request headers and body.
+
+```java
+@PostMapping("/accounts")
+public void handle(HttpEntity<Account> entity) {
+ // ...
+}
+```
+
+##### Jackson JSON
+
+CHECK IF WE WANT TO INCLUDE THIS
+
+### Models and Views
+
+#### Model
+
+Simply put, the `Model` is an object allowing you to supply attributes used for rendering `views`. To provide a view with usable data, we simply add this data to its Model object. Additionally, maps with attributes can be merged with `Model` instances:
+
+```java
+@GetMapping("/showViewPage")
+public String passParametersWithModel(Model model) {
+    Map<String, String> map = new HashMap<>();
+    map.put("spring", "mvc");
+    model.addAttribute("message", "Baeldung");
+    model.mergeAttributes(map);
+    return "viewPage";
+}
+```
+
+#### ModelMap
+
+```java
+@GetMapping("/printViewPage")
+public String passParametersWithModelMap(ModelMap map) {
+    map.addAttribute("welcomeMessage", "welcome");
+    map.addAttribute("message", "Baeldung");
+    return "viewPage";
+}
+```
+
+The advantage of `ModelMap` is that it gives us the ability to pass a collection of values and treat these values as if they were within a `Map`.
+
+#### ModelAndView
+
+```java
+@GetMapping("/goToViewPage")
+public ModelAndView passParametersWithModelAndView() {
+    ModelAndView modelAndView = new ModelAndView("viewPage");
+    modelAndView.addObject("message", "Baeldung");
+    return modelAndView;
+}
+```
+
+This interface allows us to pass all the information required by Spring MVC in one return.
+
+#### Model Attributes
+
+A controller can have any number of @ModelAttribute methods. All such methods are invoked before @RequestMapping methods in the same controller. A @ModelAttribute method can also be shared across controllers through @ControllerAdvice.
+@ModelAttribute methods have flexible method signatures. They support many of the same arguments as @RequestMapping methods, except for @ModelAttribute itself or anything related to the request body.
+
+You can use the @ModelAttribute annotation:
+
+* On a method argument in @RequestMapping methods to create or access an Object from the model
+* As a method-level annotation in @Controller or @ControllerAdvice classes that help to initialize the model prior to any @RequestMapping method invocation.
+* On a @RequestMapping method to mark its return value is a model attribute.
+
+```java
+@Controller
+public class EmployeeController {
+
+    @RequestMapping(value = "/addEmployee", method = RequestMethod.POST)
+    public String submit(@ModelAttribute("employee") Employee employee, ModelMap model) {
+        // ...
+    }
+
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("msg", "Hello World!");
+    }
+}
+```
+
+### Exceptions
+
+`@Controller` and `@ControllerAdvice` classes can have `@ExceptionHandler` methods to handle exceptions from controller methods, as the following example shows:
+
+```java
+@Controller
+public class SimpleController {
+
+ // ...
+
+ @ExceptionHandler
+ public ResponseEntity<String> handle(IOException ex) {
+  // ...
+ }
+}
+```
+
+The exception may match against a top-level exception being propagated (that is, a direct IOException being thrown) or against the immediate cause within a top-level wrapper exception (for example, an IOException wrapped inside an IllegalStateException).
+For matching exception types, preferably declare the target exception as a method argument, as the preceding example shows. When multiple exception methods match, a root exception match is generally preferred to a cause exception match. More specifically, the ExceptionDepthComparator is used to sort exceptions based on their depth from the thrown exception type.
+
+Alternatively, the annotation declaration may narrow the exception types to match, as the following example shows:
+
+```java
+@ExceptionHandler({FileSystemException.class, RemoteException.class})
+public ResponseEntity<String> handle(IOException ex) {
+ // ...
+}
+
+Alternatively you can use a 'generic' exception type that matches both exceptions.
+
+@ExceptionHandler({FileSystemException.class, RemoteException.class})
+public ResponseEntity<String> handle(Exception ex) {
+ // ...
+}
+```
+
+It is generally recommended that you are as specific as possible in the argument signature, reducing the potential for mismatches between root and cause exception types. Consider breaking a multi-matching method into individual `@ExceptionHandler` methods, each matching a single specific exception type through its signature.
+
+### Controller Advice
+
+Typically `@ExceptionHandler` and `@ModelAttribute` methods apply within the `@Controller` class (or class hierarchy) in which they are declared. If you want such methods to apply more globally (across controllers), you can declare them in a class annotated with `@ControllerAdvice` or `@RestControllerAdvice`.
+`@ControllerAdvice` is annotated with @Component, which means such classes can be registered as Spring beans through component scanning.
+
+On startup, the infrastructure classes for `@RequestMapping` and `@ExceptionHandler` methods detect Spring beans annotated with `@ControllerAdvice` and then apply their methods at runtime. Global `@ExceptionHandler` methods (from a `@ControllerAdvice`) are applied after local ones (from the `@Controller`). By contrast global `@ModelAttribute` methods are applied before local ones.
+
+By default, `@ControllerAdvice` methods apply to every request (that is, all controllers), but you can narrow that down to a subset of controllers by using attributes on the annotation, as the following example shows:
+
+```java
+// Target all Controllers annotated with @RestController
+@ControllerAdvice(annotations = RestController.class)
+public class ExampleAdvice1 {}
+
+// Target all Controllers within specific packages
+@ControllerAdvice("org.example.controllers")
+public class ExampleAdvice2 {}
+
+// Target all Controllers assignable to specific classes
+@ControllerAdvice(assignableTypes = {ControllerInterface.class, AbstractController.class})
+public class ExampleAdvice3 {}
+```
+
+
 ---
 
-## Sources
+## Sources and Information
 
-* [Spring Docs](https://spring.getdocs.org/en-US/spring-framework-docs/docs/spring-web/spring-web.html)
+* [Spring Documentation](https://spring.getdocs.org/en-US/spring-framework-docs/docs/spring-web/spring-web.html)
 * [Context Path](https://www.baeldung.com/spring-boot-context-path)
 * [Interceptions](https://www.baeldung.com/spring-mvc-handlerinterceptor)
 * [Multipart Resolving](https://www.baeldung.com/spring-file-upload)
+* [Models and Views](https://www.baeldung.com/spring-mvc-model-model-map-model-view)
