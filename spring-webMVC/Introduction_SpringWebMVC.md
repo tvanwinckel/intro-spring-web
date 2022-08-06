@@ -121,7 +121,7 @@ Spring Boot version 1:
 @Bean
 public EmbeddedServletContainerCustomizer
   embeddedServletContainerCustomizer() {
-    return container -> container.setContextPath("/spring-mvc-intro-context-path");
+    return container -> container.setContextPath("/spring-web-mvc");
 }
 ```
 
@@ -131,7 +131,7 @@ Spring Boot version 2:
 @Bean
 public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>
   webServerFactoryCustomizer() {
-    return factory -> factory.setContextPath("/spring-mvc-intro-context-path");
+    return factory -> factory.setContextPath("/spring-web-mvc");
 }
 ```
 
@@ -145,7 +145,7 @@ java -jar app.jar --server.servlet.context-path=/spring-mvc-intro-context-path
 
 ```java
 public static void main(String[] args) {
-    System.setProperty("server.servlet.context-path", "/spring-mvc-intro-context-path");
+    System.setProperty("server.servlet.context-path", "/spring-web-mvc");
     SpringApplication.run(Application.class, args);
 }
 ```
@@ -341,7 +341,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 ![Front Controller Pattern](https://example.com "Front Controller Pattern")
 
-> [Exercise 1](https://example.com "Exercise 1"): Setting up an application with a custom context path.
+> [Exercise 1](https://github.com/tvanwinckel/intro-spring-web/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-1.md "Exercise 1"): Setting up an application with a custom context path.
 [Exercise 2](https://example.com "Exercise 2"): Intercepting requests.
 
 ---
