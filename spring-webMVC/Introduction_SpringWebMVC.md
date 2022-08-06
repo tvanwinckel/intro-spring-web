@@ -341,7 +341,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 ![Front Controller Pattern](https://example.com "Front Controller Pattern")
 
-> [Exercise 1](https://github.com/tvanwinckel/intro-spring-web/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-1.md "Exercise 1"): Setting up an application with a custom context path.
+> [Exercise 1](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-1.md "Exercise 1"): Setting up an application with a custom context path.
 [Exercise 2](https://example.com "Exercise 2"): Intercepting requests.
 
 ---
