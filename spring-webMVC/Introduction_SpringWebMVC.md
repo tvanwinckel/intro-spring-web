@@ -341,6 +341,9 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 ![Front Controller Pattern](https://example.com "Front Controller Pattern")
 
+> [Exercise 1](https://example.com "Exercise 1"): Setting up an application with a custom context path.
+[Exercise 2](https://example.com "Exercise 2"): Intercepting requests.
+
 ---
 
 ## Controllers
@@ -448,6 +451,9 @@ Accepted Patterns:
   - /a/very/long/path/with/a/file.txt
 ```
 
+> [Exercise 3](https://example.com "Exercise 3"): Creating controllers and apply request mappings to them.
+[Exercise 3b](https://example.com "Exercise 3b"): Expanding reaquest mappings with wildcard patterns.
+
 You can also declare URI variables and access their values with `@PathVariable` as shown below:
 
 ```java
@@ -505,6 +511,8 @@ public Pet getPet(@PathVariable String petId) {
  Negated expressions are also supported — for example, `!text/plain` means any content type other than `text/plain`.
 You can declare a shared `produces~ attribute at the class level. However, when used at the class level, a method-level produces attribute overrides rather than extends the class-level declaration.
 
+> [Exercise 4](https://example.com "Exercise 4"): Consuming and producing.
+
 ### Parameters & Headers
 
 You can narrow request mappings based on request parameter conditions. You can test for the presence of a request parameter `myParam`, for the absence of one `!myParam`, or for a specific value `myParam=myValue`.
@@ -526,6 +534,8 @@ public void findPet(@PathVariable String petId) {
  // ...
 }
 ```
+
+> [Exercise 5](https://example.com "Exercise 5"): Accepting variables into your handler methods.
 
 ### Handler Methods
 
