@@ -24,7 +24,7 @@ public class HelloWorldController {
 }
 ```
 
-View is required to be put in the correct path: `/src/main/java/resources/templates`
+View is required to be put in the correct path: `/src/main/java/resources/templates/helloWorldView.html`
 
 ```html
 <!DOCTYPE HTML>
