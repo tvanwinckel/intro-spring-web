@@ -1,15 +1,6 @@
-package com.tvanwinckel.webmvc;
+# Exercise 4: a solution
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+```java
 @Controller
 @RequestMapping(path = "/inventory")
 public class InventoryController {
@@ -27,6 +18,13 @@ public class InventoryController {
 
     @PostMapping(path = "/items")
     public String addItemToInventory(@RequestParam(name = "item") final String item, final Model model) {
+        items.add(item);
+        model.addAttribute("message", inventoryItemsToString());
+        return "inventoryView";
+    }
+
+    @PostMapping(path = "/items2", params = "item")
+    public String addItemToInventory2(final String item, final Model model) {
         items.add(item);
         model.addAttribute("message", inventoryItemsToString());
         return "inventoryView";
@@ -67,3 +65,4 @@ public class InventoryController {
         return inventoryItemList.toString();
     }
 }
+```

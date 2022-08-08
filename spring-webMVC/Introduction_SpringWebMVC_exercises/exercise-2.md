@@ -4,6 +4,7 @@ For this exercise we are given a new controller returning a basic view based on 
 
 ```java
 @Controller
+@RequestMapping(path = "/inventory")
 public class InventoryController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(InventoryController.class);

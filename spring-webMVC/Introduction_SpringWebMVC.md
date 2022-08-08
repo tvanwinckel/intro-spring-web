@@ -342,7 +342,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 ![Front Controller Pattern](https://example.com "Front Controller Pattern")
 
 > [Exercise 1](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-1.md "Exercise 1"): Setting up an application with a custom context path.
-[Exercise 2](https://example.com "Exercise 2"): Intercepting requests.
+[Exercise 2](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-2.md "Exercise 2"): Intercepting requests.
 
 ---
 
@@ -451,9 +451,6 @@ Accepted Patterns:
   - /a/very/long/path/with/a/file.txt
 ```
 
-> [Exercise 3](https://example.com "Exercise 3"): Creating controllers and apply request mappings to them.
-[Exercise 3b](https://example.com "Exercise 3b"): Expanding reaquest mappings with wildcard patterns.
-
 You can also declare URI variables and access their values with `@PathVariable` as shown below:
 
 ```java
@@ -479,6 +476,9 @@ The example given below shows how an URI variable can be auto-mapped or mapped b
   // ...
  }
 ```
+
+> [Exercise 3](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-3.md "Exercise 3"): Request Mapping.
+[Exercise 3b](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-3b.md "Exercise 3b"): Expanding reaquest mappings with wildcard patterns.
 
 ### Consumable Media Types
 
@@ -511,8 +511,6 @@ public Pet getPet(@PathVariable String petId) {
  Negated expressions are also supported — for example, `!text/plain` means any content type other than `text/plain`.
 You can declare a shared `produces~ attribute at the class level. However, when used at the class level, a method-level produces attribute overrides rather than extends the class-level declaration.
 
-> [Exercise 4](https://example.com "Exercise 4"): Consuming and producing.
-
 ### Parameters & Headers
 
 You can narrow request mappings based on request parameter conditions. You can test for the presence of a request parameter `myParam`, for the absence of one `!myParam`, or for a specific value `myParam=myValue`.
@@ -520,8 +518,8 @@ You can narrow request mappings based on request parameter conditions. You can t
 Testing whether a parameter equals a specific value.
 
 ```java
-@GetMapping(path = "/pets/{petId}", params = "myParam=myValue") 
-public void findPet(@PathVariable String petId) {
+@GetMapping(path = "/pets/{petId}", params = "myParam") 
+public void findPet(@PathVariable(name = "petId") String petId, String myParam) {
  // ...
 }
 ```
@@ -529,13 +527,14 @@ public void findPet(@PathVariable String petId) {
 You can also use the same with request header conditions, as the following example shows:
 
 ```java
-@GetMapping(path = "/pets", headers = "myHeader=myValue") 
-public void findPet(@PathVariable String petId) {
+@GetMapping(path = "/pets", headers = "myHeader") 
+public void findPet(@PathVariable String petId, String myHeader) {
  // ...
 }
 ```
 
-> [Exercise 5](https://example.com "Exercise 5"): Accepting variables into your handler methods.
+> [Exercise 4](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-4.md "Exercise 4"): Accepting variables sent to a controller.
+[Exercise 5](https://example.com "Exercise 5"): Accepting variables into your handler methods.
 
 ### Handler Methods
 
