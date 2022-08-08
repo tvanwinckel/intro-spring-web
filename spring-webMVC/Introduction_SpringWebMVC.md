@@ -534,7 +534,7 @@ public void findPet(@PathVariable String petId, String myHeader) {
 ```
 
 > [Exercise 4](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-4.md "Exercise 4"): Accepting variables sent to a controller.
-[Exercise 5](https://example.com "Exercise 5"): Accepting variables into your handler methods.
+[Exercise 5](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-5.md "Exercise 5"): Accepting variables into your handler methods.
 
 ### Handler Methods
 
