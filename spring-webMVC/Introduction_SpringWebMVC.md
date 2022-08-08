@@ -250,15 +250,15 @@ The following table lists the special beans detected by the DispatcherServlet:
 
 All HandlerMapping implementations support handler interceptors that are useful when you want to apply specific functionality to certain requests. Interceptors must implement *HandlerInterceptor* from the `org.springframework.web.servlet` package with three methods that should provide enough flexibility to do all kinds of pre-processing and post-processing:
 
-* preHandle, before the actual handler is executed
-* postHandle, after the handler is executed
-* afterCompletion, after the complete request has finished
+* `preHandle`, before the actual handler is executed
+* `postHandle`, after the handler is executed
+* `afterCompletion`, after the complete request has finished
 
 The `prehandle(..)` method returns a boolean value. You can use this method to break or continue the processing of the execution chain. When this method returns true, the handler execution chain continues. When it returns false, the DispatcherServlet assumes the interceptor itself has taken care of requests (and, for example, rendered an appropriate view) and does not continue executing the other interceptors and the actual handler in the execution chain
 
 ![Interceptions](https://example.com "Interceptions")
 
-Note that `postHandle(..)` is less useful with `@ResponseBody` and `ResponseEntity` methods for which the response is written and committed within the `HandlerAdapter` and before `postHandle(..)`. That means it is too late to make any changes to the response, such as adding an extra header. For such scenarios, you can implement `ResponseBodyAdvice`.
+Note that `postHandle(..)` is less useful with `@ResponseBody` and `ResponseEntity` methods for which the response is written and committed within the `HandlerAdapter` and before `postHandle(..)`. That means it is too late to make any changes to the response, such as adding an extra header.
 
 #### Interception Examples
 
@@ -724,6 +724,8 @@ public class EmployeeController {
     }
 }
 ```
+
+> During exercises extend the postHandleMethod of an interceptor with adding data to the model/view
 
 ### Exceptions
 
