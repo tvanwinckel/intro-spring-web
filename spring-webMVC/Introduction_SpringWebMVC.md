@@ -728,6 +728,8 @@ public class EmployeeController {
 
 > [Exercise 6](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-6.md "Exercise 6"): Models.
 
+TODO ADD SOLUTION FOR @ModdelAttribute
+
 ### Exceptions
 
 `@Controller` and `@ControllerAdvice` classes can have `@ExceptionHandler` methods to handle exceptions from controller methods, as the following example shows:
@@ -765,6 +767,8 @@ public ResponseEntity<String> handle(Exception ex) {
 ```
 
 It is generally recommended that you are as specific as possible in the argument signature, reducing the potential for mismatches between root and cause exception types. Consider breaking a multi-matching method into individual `@ExceptionHandler` methods, each matching a single specific exception type through its signature.
+
+> [Exercise 7](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-7.md "Exercise 7"): Models.
 
 ### Controller Advice
 
