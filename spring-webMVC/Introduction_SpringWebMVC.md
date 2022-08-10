@@ -533,9 +533,6 @@ public void findPet(@PathVariable String petId, String myHeader) {
 }
 ```
 
-> [Exercise 4](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-4.md "Exercise 4"): Accepting variables sent to a controller.
-[Exercise 5](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-5.md "Exercise 5"): Accepting variables into your handler methods.
-
 ### Handler Methods
 
 `@RequestMapping` handler methods have a flexible signature and can choose from a range of supported controller method arguments and return values.
@@ -654,6 +651,9 @@ public void handle(HttpEntity<Account> entity) {
 
 CHECK IF WE WANT TO INCLUDE THIS
 
+> [Exercise 4](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-4.md "Exercise 4"): Accepting variables sent to a controller.
+[Exercise 5](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-5.md "Exercise 5"): Accepting variables into your handler methods.
+
 ### Models and Views
 
 #### Model
@@ -725,6 +725,8 @@ public class EmployeeController {
 ```
 
 > During exercises extend the postHandleMethod of an interceptor with adding data to the model/view
+
+> [Exercise 6](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-6.md "Exercise 6"): Models.
 
 ### Exceptions
 

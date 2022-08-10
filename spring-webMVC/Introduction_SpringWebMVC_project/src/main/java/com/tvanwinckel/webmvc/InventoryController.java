@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,10 +29,12 @@ public class InventoryController {
     }
 
     @PostMapping(path = "/items", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String addItemToInventory(@RequestBody final InventoryItem item, final Model model) {
+    public ModelAndView addItemToInventory(@RequestBody final InventoryItem item) {
         items.add(item);
-        model.addAttribute("message", "Added: " + item.toString());
-        return "inventoryView";
+
+        final ModelAndView view = new ModelAndView("inventoryView");
+        view.addObject("message", "Added: " + item.toString());
+        return view;
     }
 
     @GetMapping (path = "/items/{index}")
