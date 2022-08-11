@@ -1,4 +1,4 @@
-package com.tvanwinckel.webmvc;
+package com.tvanwinckel.webmvc.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

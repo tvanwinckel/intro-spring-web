@@ -1,6 +1,7 @@
-package com.tvanwinckel.webmvc;
+package com.tvanwinckel.webmvc.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tvanwinckel.webmvc.exceptions.NotEnoughCurrencyException;
 
 import java.util.Objects;
 

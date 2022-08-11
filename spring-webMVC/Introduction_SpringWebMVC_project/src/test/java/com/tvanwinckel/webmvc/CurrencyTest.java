@@ -1,5 +1,6 @@
 package com.tvanwinckel.webmvc;
 
+import com.tvanwinckel.webmvc.models.Currency;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package com.tvanwinckel.webmvc;
+package com.tvanwinckel.webmvc.config;
 
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
