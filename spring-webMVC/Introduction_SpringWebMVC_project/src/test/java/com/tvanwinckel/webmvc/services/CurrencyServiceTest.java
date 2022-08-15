@@ -1,17 +1,21 @@
-package com.tvanwinckel.webmvc;
+package com.tvanwinckel.webmvc.services;
 
 import com.tvanwinckel.webmvc.models.Currency;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class CurrencyTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class CurrencyServiceTest {
+
+    private final CurrencyService currencyService = new CurrencyService();
 
     @Test
-    public void testAddCurrencies() {
+    void testAddCurrencies() {
         final Currency c1 = new Currency(10, 20, 30);
         final Currency c2 = new Currency(10, 20, 30);
 
-        final Currency result = c1.add(c2);
+        final Currency result = currencyService.add(c1, c2);
         Assertions.assertThat(result).isEqualTo(new Currency(20, 40, 60));
     }
 
@@ -20,7 +24,7 @@ class CurrencyTest {
         final Currency c1 = new Currency(0, 99, 99);
         final Currency c2 = new Currency(0, 0, 1);
 
-        final Currency result = c1.add(c2);
+        final Currency result = currencyService.add(c1, c2);
         Assertions.assertThat(result).isEqualTo(new Currency(1, 0, 0));
     }
 
@@ -29,7 +33,7 @@ class CurrencyTest {
         final Currency c1 = new Currency(10, 20, 30);
         final Currency c2 = new Currency(10, 20, 30);
 
-        final Currency result = c1.subtract(c2);
+        final Currency result = currencyService.subtract(c1, c2);
         Assertions.assertThat(result).isEqualTo(new Currency(0, 0, 0));
     }
 
@@ -38,8 +42,8 @@ class CurrencyTest {
         final Currency c1 = new Currency(1, 24, 0);
         final Currency c2 = new Currency(0, 0, 1);
 
-        final Currency result = c1.subtract(c2);
-        Assertions.assertThat(result).isEqualTo(new Currency(0, 99, 99));
+        final Currency result = currencyService.subtract(c1, c2);
+        Assertions.assertThat(result).isEqualTo(new Currency(1, 23, 99));
     }
 
     @Test
@@ -48,6 +52,6 @@ class CurrencyTest {
         final Currency c2 = new Currency(1, 0, 0);
 
         Assertions.assertThatExceptionOfType(Exception.class)
-                .isThrownBy(() -> c1.subtract(c2));
+                .isThrownBy(() -> currencyService.subtract(c1, c2));
     }
 }

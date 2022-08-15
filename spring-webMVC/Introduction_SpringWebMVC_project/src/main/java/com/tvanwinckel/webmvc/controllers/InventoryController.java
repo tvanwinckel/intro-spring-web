@@ -1,14 +1,9 @@
 package com.tvanwinckel.webmvc.controllers;
 
-import com.tvanwinckel.webmvc.models.Currency;
 import com.tvanwinckel.webmvc.models.InventoryItem;
-import com.tvanwinckel.webmvc.exceptions.NotEnoughCurrencyException;
-import com.tvanwinckel.webmvc.exceptions.UnknownCurrencyOpperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +23,6 @@ public class InventoryController {
                     new InventoryItem("Shield", "common", 35)));
 
 
-
     @GetMapping(path = "/items", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<InventoryItem> getItemsFromInventory() {
@@ -45,9 +39,14 @@ public class InventoryController {
         return view;
     }
 
-    @GetMapping (path = "/items/{index}")
+    @GetMapping(path = "/items/{index}")
     public InventoryItem getItemFromInventory(@PathVariable(name = "index") final int itemIndex) {
         return items.get(itemIndex);
+    }
+
+    @ModelAttribute
+    public void addTotalItemsInInventoryAttribute(final Model model) {
+        model.addAttribute("numberOfTotalItems", items.size());
     }
 
 //    @GetMapping(path = "/gold")
@@ -70,8 +69,4 @@ public class InventoryController {
 //
 //        return "inventoryView";
 //    }
-
-
-
-
 }

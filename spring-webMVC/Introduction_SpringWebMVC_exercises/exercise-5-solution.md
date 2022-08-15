@@ -1,33 +1,69 @@
-# Exercise 5: a solution
+# Exercise 5: A solution
+
+A solution for the CurrencyController. Note! It is in general bad practice to introduce additional logic like checking the secret and action into the controller. You want to "hide" this in your Service/Usecase. This is just for demonstration purpose.
 
 ```java
 @Controller
-@RequestMapping(path = "/inventory")
-public class InventoryController {
+@RequestMapping(path = "/currency")
+public class CurrencyController {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(InventoryController.class);
-    private final List<InventoryItem> items = new ArrayList<InventoryItem>(
-            Arrays.asList(new InventoryItem("Sword", "epic", 100),
-                    new InventoryItem("Shield", "common", 35)));
+    private final static Logger LOGGER = LoggerFactory.getLogger(CurrencyController.class);
 
+    private final CurrencyService currencyService;
+    private final CurrencyRepository currencyRepository;
 
-    @GetMapping(path = "/items", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public List<InventoryItem> getItemsFromInventory() {
-        LOGGER.info("Received a GET request on the inventoryMethod.");
-        return items;
+    @Autowired
+    public CurrencyController(final CurrencyService currencyService, final CurrencyRepository currencyRepository) {
+        this.currencyService = currencyService;
+        this.currencyRepository = currencyRepository;
     }
 
-    @PostMapping(path = "/items", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String addItemToInventory(@RequestBody final InventoryItem item, final Model model) {
-        items.add(item);
-        model.addAttribute("message", "Added: " + item.toString());
+    @GetMapping
+    public String getTotalCurrency(final Model model) {
+        LOGGER.info("GET total currency.");
+        model.addAttribute("message", "Total amount of currency: " + currencyRepository.getAll());
         return "inventoryView";
     }
 
-    @GetMapping (path = "/items/{index}")
-    public InventoryItem getItemFromInventory(@PathVariable(name = "index") final int itemIndex) {
-        return items.get(itemIndex);
+    @PostMapping
+    public String addOrSubtractGoldToInventory(@RequestBody final Currency currency,
+                                               @RequestParam(name = "action", required = false, defaultValue = "add") final String action,
+                                               @RequestHeader(name = "key") final String key,
+                                               final Model model) {
+        if (key.equals("secret")) {
+            if (action.equals("add")) {
+                final Currency current_currency = currencyRepository.getAll();
+                final Currency newCurrency = currencyService.add(current_currency, currency);
+                model.addAttribute("message", "Amount of currency: " + newCurrency);
+            } else if (action.equals("subtract")) {
+                final Currency current_currency = currencyRepository.getAll();
+                final Currency newCurrency = currencyService.subtract(current_currency, currency);
+                model.addAttribute("message", "Amount of currency: " + newCurrency);
+            } else {
+                model.addAttribute("message", "Sorry, no action taken");
+            }
+        } else {
+            model.addAttribute("message", "Sorry, wallet is locked");
+        }
+
+        return "inventoryView";
     }
-}
+```
+
+```java
+public class Currency {
+
+    private final int gold;
+    private final int silver;
+    private final int copper;
+
+    public Currency(@JsonProperty(value = "gold") int gold,
+                    @JsonProperty(value = "silver") int silver,
+                    @JsonProperty(value = "copper") int copper) {
+        this.gold = gold;
+        this.silver = silver;
+        this.copper = copper;
+    }
+
+    // ... Getters, toString, ...
 ```

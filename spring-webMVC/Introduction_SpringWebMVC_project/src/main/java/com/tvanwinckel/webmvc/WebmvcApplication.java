@@ -7,10 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WebmvcApplication {
 
 	public static void main(String[] args) {
-//		TODO Exercise 1: Using Java System properties
 		System.setProperty("server.servlet.context-path", "/spring-web-mvc");
 
 		SpringApplication.run(WebmvcApplication.class, args);
 	}
-
 }

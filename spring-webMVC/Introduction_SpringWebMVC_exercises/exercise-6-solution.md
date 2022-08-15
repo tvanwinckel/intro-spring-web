@@ -30,3 +30,12 @@ public ModelAndView addItemToInventory(@RequestBody final InventoryItem item) {
     return view;
 }
 ```
+
+Example of a 'general' attribute added to the model that sets the total number of items in the inventory.
+
+```java
+@ModelAttribute
+public void addTotalItemsInInventoryAttribute(final Model model) {
+    model.addAttribute("numberOfTotalItems", items.size());
+}
+```

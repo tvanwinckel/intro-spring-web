@@ -26,7 +26,7 @@ The goal of this document is to offer you an easy and quick way to get started w
 
 ## The Dispatcherservlet
 
-Spring MVC, as many other web frameworks, is designed aroudn the *Front Controller* pattern where a central *Servlet*, the *DispatcherServlet*, provides a shared algorithm for request processing while actual work is performed by configurable delegate components. This model is flexible and supports diverse workflows.
+Spring MVC, as many other web frameworks, is designed around the *Front Controller* pattern where a central *Servlet*, the *DispatcherServlet*, provides a shared algorithm for request processing while actual work is performed by configurable delegate components. This model is flexible and supports diverse workflows.
 
 ### The Front Controller pattern
 
@@ -43,7 +43,7 @@ Spring MVC, as many other web frameworks, is designed aroudn the *Front Controll
 
 ### Servlets
 
-The *DispatcherServlet*, needs to be declared and mapped according to the Servlet specification by using *Java configuration* or in *web.xml*. In turn, the DispatcherServlet uses Spring configuration to discover the delegate components it needs for request mapping, view resolution, exception handling, and more.
+The *DispatcherServlet*, can to be declared and mapped according to the Servlet specification by using *Java configuration* or in *web.xml*. In turn, the *DispatcherServlet* uses Spring configuration to discover the delegate components it needs for request mapping, view resolution, exception handling, and more.
 
 The following example registers and initializes the DispatcherServlet which is auto-detected by the Servlet container. Alternatively one could exted the `AbstractAnnotationConfigDispatcherServletInitializer` and override specific methods:
 
@@ -154,23 +154,23 @@ public static void main(String[] args) {
 
 ```bash
 Unix:
-$ export SERVER_SERVLET_CONTEXT_PATH=/spring-mvc-intro-context-path
+$ export SERVER_SERVLET_CONTEXT_PATH=/spring-web-mvc
 
 Windows:
-$ set SERVER_SERVLET_CONTEXT_PATH=/spring-mvc-intro-context-path
+$ set SERVER_SERVLET_CONTEXT_PATH=/spring-web-mvc
 ```
 
 ##### Application properties
 
 ```yml
-server.servlet.context-path=/spring-mvc-intro-context-path
+server.servlet.context-path=/spring-web-mvc
 ```
 
 ### Context Hierarchy
 
 For most applicatons, having a single *WebApplicationContext* is sufficient. But it is also possible to have a context hierarchy where one root WebApplicationContext is shared acros multiple *DispatcherServlet* instances, each with its own child *WebApplicationContext* configuration.
 
-The root *WebApplicationContext* typically contains infrastructure beans such as data repositories and/or business services that need to be shared acress multiple *Servlet* instances. Those beans are effectively inherited and can be overridden in the Servlet specific child *WebApplicationContext*, that contains beans local tothe given *Servlet*. It is woth mentioning that we can use different contexts to prevent beans registered in one context from becoming accessible in another one. This facilitates teh creation of loosely coupled modules.
+The root *WebApplicationContext* typically contains infrastructure beans such as data repositories and/or business services that need to be shared across multiple *Servlet* instances. Those beans are actually inherited and can be overridden in the Servlet specific child *WebApplicationContext*, that contains beans local to the given *Servlet*. It is worth mentioning that we can use different contexts to prevent beans registered in one context from becoming accessible in another one. This facilitates teh creation of loosely coupled modules.
 
 The image underneath gives an overview of how that releationship might look like.
 
@@ -248,7 +248,7 @@ The following table lists the special beans detected by the DispatcherServlet:
 
 ### Interceptions
 
-All HandlerMapping implementations support handler interceptors that are useful when you want to apply specific functionality to certain requests. Interceptors must implement *HandlerInterceptor* from the `org.springframework.web.servlet` package with three methods that should provide enough flexibility to do all kinds of pre-processing and post-processing:
+All HandlerMapping implementations support handler interceptors that are useful when you want to apply specific functionality to certain requests. Interceptors must implement *HandlerInterceptor* from the `org.springframework.web.servlet` package with three methods that should provide enough flexibility to do all kinds of pre- and post-processing:
 
 * `preHandle`, before the actual handler is executed
 * `postHandle`, after the handler is executed
@@ -258,7 +258,7 @@ The `prehandle(..)` method returns a boolean value. You can use this method to b
 
 ![Interceptions](https://example.com "Interceptions")
 
-Note that `postHandle(..)` is less useful with `@ResponseBody` and `ResponseEntity` methods for which the response is written and committed within the `HandlerAdapter` and before `postHandle(..)`. That means it is too late to make any changes to the response, such as adding an extra header.
+Note that `postHandle(..)` is less useful with `@ResponseBody` and `ResponseEntity` methods for which the response is written and committed within the `HandlerAdapter` and before `postHandle(..)` (we will touch upon this subject later on). That means it is too late to make any changes to the response, such as adding an extra header.
 
 #### Interception Examples
 
@@ -454,8 +454,8 @@ Accepted Patterns:
 You can also declare URI variables and access their values with `@PathVariable` as shown below:
 
 ```java
- @GetMapping("/{id}")
- public Person getPerson(@PathVariable Long id) {
+ @GetMapping("/{itemId}")
+ public Item getItem(@PathVariable Long itemId) {
   // ...
  }
 ```
@@ -466,8 +466,8 @@ You can explicitly name URI variables, but you can leave that detail out if the 
 The example given below shows how an URI variable can be auto-mapped or mapped based on name:
 
 ```java
- @GetMapping("/{id}")
- public Person getPerson(@PathVariable Long id) {
+  @GetMapping("/{itemId}")
+ public Item getItem(@PathVariable Long itemId) {
   // ...
  }
 
@@ -485,8 +485,8 @@ The example given below shows how an URI variable can be auto-mapped or mapped b
 You can narrow the request mapping based on the `Content-Type` of the request:
 
 ```java
-@PostMapping(path = "/pets", consumes = "application/json") 
-public void addPet(@RequestBody Pet pet) {
+@PostMapping(path = "/items", consumes = "application/json") 
+public void addItem(@RequestBody(name = "item") Item item) {
  // ...
 }
 ```
@@ -501,10 +501,11 @@ You can declare a shared consumes attribute at the class level. However, when us
 You can narrow the request mapping based on the Accept request header and the list of content types that a controller method produces.
 
 ```java
-@GetMapping(path = "/pets/{petId}", produces = "application/json") 
+@GetMapping(path = "/items/{itemId}", produces = "application/json") 
 @ResponseBody
-public Pet getPet(@PathVariable String petId) {
+public Item getItem(@PathVariable(name = "itemId") String itemId) {
  // ...
+  return Item(...)
 }
 ```
 
@@ -518,8 +519,8 @@ You can narrow request mappings based on request parameter conditions. You can t
 Testing whether a parameter equals a specific value.
 
 ```java
-@GetMapping(path = "/pets/{petId}", params = "myParam") 
-public void findPet(@PathVariable(name = "petId") String petId, String myParam) {
+@GetMapping(path = "/items/{itemId}", params = "myParam") 
+public Item getItem(@PathVariable(name = "itemId") String itemId, String myParam) {
  // ...
 }
 ```
@@ -527,8 +528,8 @@ public void findPet(@PathVariable(name = "petId") String petId, String myParam) 
 You can also use the same with request header conditions, as the following example shows:
 
 ```java
-@GetMapping(path = "/pets", headers = "myHeader") 
-public void findPet(@PathVariable String petId, String myHeader) {
+@GetMapping(path = "/items/{itemId}", headers = "myHeader") 
+public Item getItem(@PathVariable String itemId, String myHeader) {
  // ...
 }
 ```
@@ -556,14 +557,13 @@ The following example shows how to do so:
 
 ```java
 @Controller
-@RequestMapping("/pets")
-public class EditPetForm {
+@RequestMapping("/items")
+public class EditItemForm {
 
  @GetMapping
- public String setupForm(@RequestParam("petId") int petId, Model model) { 
-  Pet pet = this.clinic.loadPet(petId);
-  model.addAttribute("pet", pet);
-  return "petForm";
+ public String setupForm(@RequestParam("itemId") int itemId, Model model) { 
+  // ...
+  return "itemForm";
  }
 }
 ```
@@ -586,7 +586,7 @@ Keep-Alive              300
 The following example gets the value of the Accept-Encoding and Keep-Alive headers:
 
 ```java
-@GetMapping("/demo")
+@GetMapping("/request-header")
 public void handle(
   @RequestHeader("Accept-Encoding") String encoding, 
   @RequestHeader("Keep-Alive") long keepAlive) { 
@@ -599,8 +599,8 @@ public void handle(
 You can use the @RequestBody annotation to have the request body read and deserialized into an Object through an HttpMessageConverter. The following example uses a @RequestBody argument:
 
 ```java
-@PostMapping("/accounts")
-public void handle(@RequestBody Account account) {
+@PostMapping("/request-body")
+public void handle(@RequestBody Item item) {
  // ...
 }
 ```
@@ -611,7 +611,9 @@ You can use the `@ModelAttribute` annotation on a method argument to access an a
 
 ```java
 @PostMapping("/owners/{ownerId}/pets/{petId}/edit")
-public String processSubmit(@ModelAttribute Pet pet) { }
+public String processSubmit(@ModelAttribute Pet pet) { 
+  // ...
+}
 ```
 
 #### Return Values
@@ -646,10 +648,6 @@ public void handle(HttpEntity<Account> entity) {
  // ...
 }
 ```
-
-##### Jackson JSON
-
-CHECK IF WE WANT TO INCLUDE THIS
 
 > [Exercise 4](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-4.md "Exercise 4"): Accepting variables sent to a controller.
 [Exercise 5](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-5.md "Exercise 5"): Accepting variables into your handler methods.
@@ -724,11 +722,7 @@ public class EmployeeController {
 }
 ```
 
-> During exercises extend the postHandleMethod of an interceptor with adding data to the model/view
-
 > [Exercise 6](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-6.md "Exercise 6"): Models.
-
-TODO ADD SOLUTION FOR @ModdelAttribute
 
 ### Exceptions
 
@@ -768,7 +762,7 @@ public ResponseEntity<String> handle(Exception ex) {
 
 It is generally recommended that you are as specific as possible in the argument signature, reducing the potential for mismatches between root and cause exception types. Consider breaking a multi-matching method into individual `@ExceptionHandler` methods, each matching a single specific exception type through its signature.
 
-> [Exercise 7](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-7.md "Exercise 7"): Models.
+> [Exercise 7](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-7.md "Exercise 7"): Handling exceptions.
 
 ### Controller Advice
 
@@ -793,6 +787,8 @@ public class ExampleAdvice2 {}
 public class ExampleAdvice3 {}
 ```
 
+> [Exercise 8](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-8.md "Exercise 8"): Controller Advices.
+
 ---
 
 ## View Technologies
@@ -801,13 +797,13 @@ The use of view technologies in Spring MVC is pluggable, whether you decide to u
 
 For this document we will be focussing on the Thymeleaf view technology.
 
-WHAT DO WE NEED TO DO TO GET STARTED WITH THYMELEAF
+Spring Boot Thymeleaf Gradle dependency:
 
-```java
-
-Code examples for working with Thymeleaf
-
+```gradle
+implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 ```
+
+> [Exercise 9](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-9.md "Exercise 9"): A simple Thymeleaf form.
 
 [Getting with Thymeleaf and Spring](https://spring.io/guides/gs/handling-form-submission/)
 [Creating a form](https://www.baeldung.com/spring-mvc-form-tutorial)

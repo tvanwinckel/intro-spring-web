@@ -39,4 +39,4 @@ Using path variables, request parameters or headers, add the following methods:
 
 **Extra:**
 
-* When adding gold, when no amount of gold, is given default to zero.
+* When adding gold and no amount of gold, is given default to zero.

@@ -78,6 +78,18 @@ Rework the controller to:
 * Return a list of items in the inventory.
 * Add a new item to the inventoy, added as a Json object.
 
-**Extra**
+## Extra
 
-Rework the field variable 'gold' to become a 'currency' object having gold, silver and copper fields. Allow the controller to return the total amount of currency in the inventory and add/subtract currency to/from the inventory.
+1. Remove (or comment out) the gold methods from the InventoryController and create a seperate controller: CurrencyController. Currency should be an object containing gold, silver and copper.
+Allow the controller to return the total amount of currency in the inventory and add/subtract currency to/from the inventory.
+2. Now that we have multiple controllers, adjust our interception strategy and add an extra interceptor specifically for currencies. Make sure the initial interceptor does not catch any currency requests anymore.
+
+Json representation of Currency.
+
+```json
+{
+    "gold" :25, 
+    "silver" :47, 
+    "copper" :34
+}
+```
