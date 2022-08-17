@@ -40,3 +40,4 @@ Add different request mappings (GET, POST, PUT, DELETE, ...) to the controller a
   * In the same controller class
   * In a different controller class
 * What happens if two mappings of a different type direct to the same endpoint?
+* Try out some additional requestmappings using the wildcard patterns: `*`, `**` and `?`.

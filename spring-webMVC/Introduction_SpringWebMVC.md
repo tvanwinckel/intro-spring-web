@@ -472,13 +472,12 @@ The example given below shows how an URI variable can be auto-mapped or mapped b
  }
 
   @GetMapping("/{obscureVariableName}")
- public Person getPerson(@PathVariable("obscureVariableName") Long id) {
+ public Person getItem(@PathVariable("obscureVariableName") Long itemId) {
   // ...
  }
 ```
 
 > [Exercise 3](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-3.md "Exercise 3"): Request Mapping.
-[Exercise 3b](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-3b.md "Exercise 3b"): Expanding reaquest mappings with wildcard patterns.
 
 ### Consumable Media Types
 
