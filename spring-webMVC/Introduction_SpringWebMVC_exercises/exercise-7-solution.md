@@ -1,3 +1,5 @@
+# Exercise 7: A solution
+
 ```java
 @ExceptionHandler(NotEnoughCurrencyException.class)
 public ResponseEntity<String> handleNotEnoughCurrencyException(final NotEnoughCurrencyException e) {

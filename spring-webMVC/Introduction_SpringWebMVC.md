@@ -30,7 +30,7 @@ Spring MVC, as many other web frameworks, is designed around the *Front Controll
 
 ### The Front Controller pattern
 
-![Front Controller Pattern](https://example.com "Front Controller Pattern")
+![Front Controller Pattern](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCFrontController.jpg?raw=true "Front Controller Pattern")
 
 1. An incoming request will be sent to the **Front Controller** (the Servlet)
 2. The **Front Controller** decides to whom it has to hand over the request, based on the request headers.
@@ -174,7 +174,7 @@ The root *WebApplicationContext* typically contains infrastructure beans such as
 
 The image underneath gives an overview of how that releationship might look like.
 
-![Context Hierarchy](https://example.com "Context Hierarchy")
+![Context Hierarchy](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCContextHyrarchy.png?raw=true "Context Hierarchy")
 
 An example of how one could configure a *WebApplicationContext* hierarchy:
 
@@ -244,7 +244,7 @@ The following table lists the special beans detected by the DispatcherServlet:
 
 ### HandlerMapping & HandlerAdapter
 
-![HandlerMapping & HandlerAdapter](https://example.com "HandlerMapping & HandlerAdapter")
+![HandlerMapping & HandlerAdapter](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCMappingAndAdapter.jpg?raw=true "HandlerMapping & HandlerAdapter")
 
 ### Interceptions
 
@@ -256,7 +256,7 @@ All HandlerMapping implementations support handler interceptors that are useful 
 
 The `prehandle(..)` method returns a boolean value. You can use this method to break or continue the processing of the execution chain. When this method returns true, the handler execution chain continues. When it returns false, the DispatcherServlet assumes the interceptor itself has taken care of requests (and, for example, rendered an appropriate view) and does not continue executing the other interceptors and the actual handler in the execution chain
 
-![Interceptions](https://example.com "Interceptions")
+![Interceptions](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCInterceptions.jpg?raw=true "Interceptions")
 
 Note that `postHandle(..)` is less useful with `@ResponseBody` and `ResponseEntity` methods for which the response is written and committed within the `HandlerAdapter` and before `postHandle(..)` (we will touch upon this subject later on). That means it is too late to make any changes to the response, such as adding an extra header.
 
@@ -304,7 +304,7 @@ The contract of HandlerExceptionResolver specifies that it can return:
 
 Spring MVC defines the `ViewResolver` and `View` interfaces that let you render models in a browser without tying you to a specific view technology. ViewResolver provides a mapping between view names and actual views. View addresses the preparation of data before handing over to a specific view technology.
 
-![View Resolution](https://example.com "View Resolution")
+![View Resolution](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCViewResolution.jpg?raw=true "View Resolution")
 
 ### Multipart Resolver
 
@@ -339,7 +339,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
 
 ### Quick recap overview
 
-![Front Controller Pattern](https://example.com "Front Controller Pattern")
+![Front Controller Pattern](https://github.com/tvanwinckel/intro-spring-web/blob/main/images/SpringMVCFrontController.jpg?raw=true "Front Controller Pattern")
 
 > [Exercise 1](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-1.md "Exercise 1"): Setting up an application with a custom context path.
 [Exercise 2](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-2.md "Exercise 2"): Intercepting requests.
@@ -803,16 +803,70 @@ Spring Boot Thymeleaf Gradle dependency:
 implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 ```
 
-> [Exercise 9](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-9.md "Exercise 9"): A simple Thymeleaf form.
+```html
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+ <h1>Form</h1>
+     <form action="#" th:action="@{/add-form-item}" th:object="${item}" method="post">
+      <p>Name: <input type="text" th:field="*{name}" /></p>
+      <p>Quality: <input type="text" th:field="*{quality}" /></p>
+      <p>Durability: <input type="text" th:field="*{durability}" /></p>
+      <p><input type="submit" value="Submit" /></p>
+     </form>
+</body>
+</html>
+```
 
-[Getting with Thymeleaf and Spring](https://spring.io/guides/gs/handling-form-submission/)
-[Creating a form](https://www.baeldung.com/spring-mvc-form-tutorial)
+> [Exercise 9](https://github.com/tvanwinckel/intro-spring-web/blob/main/spring-webMVC/Introduction_SpringWebMVC_exercises/exercise-9.md "Exercise 9"): A simple Thymeleaf form.
 
 ---
 
 ## Functional Endpoints
 
-TBD
+Spring Web MVC includes *WebMvc.fn*, a lightweight functional programming model in which functions are used to route and handle requests and contracts are designed for immutability. It is an alternative to the annotation-based programming model but otherwise runs on the same mvc-servlet.
+
+In WebMvc.fn, an HTTP request is handled with a `HandlerFunction`: a function that takes `ServerRequest` and returns a `ServerResponse`. Both the request as the response object have immutable contracts that offer JDK 8-friendly access to the HTTP request and response. HandlerFunction is the equivalent of the body of a *@RequestMapping* method in the annotation-based programming model.
+
+Incoming requests are routed to a handler function with a `RouterFunction`: a function that takes `ServerRequest` and returns an optional HandlerFunction. When the router function matches, a handler function is returned; otherwise an empty Optional. RouterFunction is the equivalent of a *@RequestMapping* annotation, but with the major difference that router functions provide not just data, but also behavior.
+
+The code example shows how this could work:
+
+```java
+ItemRepository repository = new ItemRepositoryImpl();
+ItemHandler handler = new ItemHandler(repository);
+
+RouterFunction<ServerResponse> route = route()
+ .GET("/items/{id}", accept(APPLICATION_JSON), handler::getItem)
+ .GET("/items", accept(APPLICATION_JSON), handler::getItems)
+ .POST("/items", handler::createItem)
+ .build();
+
+
+public class PersonHandler {
+
+ // ...
+
+ public ServerResponse getItems(ServerRequest request) {
+  // ...
+ }
+
+ public ServerResponse createItem(ServerRequest request) {
+  // ...
+ }
+
+ public ServerResponse getItem(ServerRequest request) {
+  final int itemId = Integer.parseInt(request.pathVariable("id"));
+  final Item item  = getItemFromSomewhere(itemId);
+  if (person != null) {
+   return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(item);
+  }
+  else {
+   return ServerResponse.notFound().build();
+  }
+ }
+}
+```
 
 ---
 
@@ -931,3 +985,5 @@ TBD
 * [Interceptions](https://www.baeldung.com/spring-mvc-handlerinterceptor)
 * [Multipart Resolving](https://www.baeldung.com/spring-file-upload)
 * [Models and Views](https://www.baeldung.com/spring-mvc-model-model-map-model-view)
+* [Getting with started Thymeleaf and Spring](https://spring.io/guides/gs/handling-form-submission/)
+* [Creating a form with Thymeleaf](https://www.baeldung.com/spring-mvc-form-tutorial)

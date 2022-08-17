@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h3>Enter character details:</h3>
+<form action="#" th:action="@{/characters}" th:object="${character}" method="post">
+    <p>Name: <input type="text" th:field="*{name}"/></p>
+    <p>Type: <input type="text" th:field="*{type}"/></p>
+    <p>Faction: <input type="text" th:field="*{faction}"/></p>
+    <p>Level: <input type="text" th:field="*{level}"/></p>
+    <p><input type="submit" value="Submit"/></p>
+</form>
+</body>
+</html>
