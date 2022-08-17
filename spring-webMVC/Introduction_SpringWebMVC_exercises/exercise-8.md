@@ -1,6 +1,6 @@
 # Exercise 8: Controller Advices
 
-Given the CurrencyController from previous exercises, we'd like to move the exception handling into a specific class (ControllerAdvice) to bundle specific exception handling instead of spreading acros multiple controllers.
+Given the CurrencyController from previous exercises, we'd like to move the exception handling into a specific class (ControllerAdvice) to bundle specific exception handling instead of spreading across multiple controllers.
 
 ## Extra
 

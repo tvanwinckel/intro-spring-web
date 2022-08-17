@@ -1,4 +1,4 @@
-# Exercise 7
+# Exercise 7: Exceptions
 
 We now have a currency object giving us a detailed view of how much gold, silver and copper we have. Our controller allows to add or subract currency from our inventory. Currency can not go below zero and if it does we throw an exception. Catch this exception:
 
@@ -32,20 +32,3 @@ public String addGoldToInventory(@RequestBody final Currency currency,
 Extra:
 
 * When you return a view to the user, send along a http 500 code instead of the default 200. (Might require you to you a ResponseEntity)
-
-```java
-@ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleAll(final Exception e) {
-        // When using a ResponseEntity it is not possible to return a Model, ModelMap or ModelAndView.
-        return new ResponseEntity<>("Oops! Something went wrong, try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView handleSpecific(final Exception e) {
-        final ModelAndView view = new ModelAndView("basicView");
-        view.addObject("message", "Oops! Something went wrong, an IllegalArgument was given.");
-        return view;
-    }
-
-```

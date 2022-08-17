@@ -8,19 +8,19 @@ The goal of this document is to offer you an easy and quick way to get started w
 
 * Dispatcherservlet
 * Controllers
-* Request mapping
-* Media types
+  * Request mapping
+  * URI Patterns
+  * Media types
   * Parameters and headers
   * Handler methods
-  * Models
-  * Exception handling
+  * Models & Views
+  * Exceptions
   * Controller Advice
 * Extras
-  * URI links
-  * CORS
-  * Caching
   * View Technologies
   * Forms
+  * Functional Endpoints
+  * URI Links
 
 ---
 
@@ -129,8 +129,7 @@ Spring Boot version 2:
 
 ```java
 @Bean
-public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>
-  webServerFactoryCustomizer() {
+public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer() {
     return factory -> factory.setContextPath("/spring-web-mvc");
 }
 ```
@@ -170,7 +169,7 @@ server.servlet.context-path=/spring-web-mvc
 
 For most applicatons, having a single *WebApplicationContext* is sufficient. But it is also possible to have a context hierarchy where one root WebApplicationContext is shared acros multiple *DispatcherServlet* instances, each with its own child *WebApplicationContext* configuration.
 
-The root *WebApplicationContext* typically contains infrastructure beans such as data repositories and/or business services that need to be shared across multiple *Servlet* instances. Those beans are actually inherited and can be overridden in the Servlet specific child *WebApplicationContext*, that contains beans local to the given *Servlet*. It is worth mentioning that we can use different contexts to prevent beans registered in one context from becoming accessible in another one. This facilitates teh creation of loosely coupled modules.
+The root *WebApplicationContext* typically contains infrastructure beans such as data repositories and/or business services that need to be shared across multiple *Servlet* instances. Those beans are actually inherited and can be overridden in the Servlet specific child *WebApplicationContext*, that contains beans local to the given *Servlet*. It is worth mentioning that we can use different contexts to prevent beans registered in one context from becoming accessible in another one. This facilitates the creation of loosely coupled modules.
 
 The image underneath gives an overview of how that releationship might look like.
 
@@ -321,20 +320,58 @@ public CommonsMultipartResolver multipartResolver() {
 }
 ```
 
-Servlet 3.0 multipart parsing needs to be enabled through Servlet container configuration.
-
-**REQUIRES EXTRA REFINEMENT, SEE BAELDUNG SOURCE**
+Servlet 3.0 multipart parsing needs to be enabled through Servlet container configuration. First you will need to configure a `MultipartConfigElement`:
 
 ```java
-public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+public class MainWebAppInitializer implements WebApplicationInitializer {
 
- @Override
- protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+    private String TMP_FOLDER = "/tmp"; 
+    private int MAX_UPLOAD_SIZE = 5 * 1024 * 1024; 
+    
+    @Override
+    public void onStartup(ServletContext sc) throws ServletException {
+        
+        ServletRegistration.Dynamic appServlet = sc.addServlet("mvc", new DispatcherServlet(
+          new GenericWebApplicationContext()));
 
-  // Optionally also set maxFileSize, maxRequestSize, fileSizeThreshold
-  registration.setMultipartConfig(new MultipartConfigElement("/tmp"));
- }
+        appServlet.setLoadOnStartup(1);
+        
+        MultipartConfigElement multipartConfigElement = new MultipartConfigElement(TMP_FOLDER, 
+          MAX_UPLOAD_SIZE, MAX_UPLOAD_SIZE * 2, MAX_UPLOAD_SIZE / 2);
+        
+        appServlet.setMultipartConfig(multipartConfigElement);
+    }
 }
+```
+
+And after that you can create a new bean for your MultipartResolver:
+
+```java
+@Bean
+public StandardServletMultipartResolver multipartResolver() {
+    return new StandardServletMultipartResolver();
+}
+```
+
+Uploading a file for both is pretty simple. You will need to provide an html input-tag 'file' and an encoding attribute 'multipart/form-data'. The rest can be handled by the controller as follow:
+
+```java
+@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+public String submit(@RequestParam("file") MultipartFile file, ModelMap modelMap) {
+    modelMap.addAttribute("file", file);
+    return "fileUploadView";
+}
+```
+
+`MultipartFile` provides access to details about the uploaded file like filename, type and so on.
+
+If we're using Spring Boot, everything we've seen so far still applies. However, Spring Boot makes it even easier to configure and start everything with little hassle. In particular, it's not necessary to configure any servlet since Boot will register and configure it for us.
+
+```properties
+spring.servlet.multipart.max-file-size=128KB
+
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.location=/tmp
 ```
 
 ### Quick recap overview
@@ -396,7 +433,7 @@ class PersonController {
 }
 ```
 
-### URI Patterns
+### URI patterns and variables
 
 You can map requests by using the following global patterns and wildcards:
 
@@ -481,7 +518,7 @@ The example given below shows how an URI variable can be auto-mapped or mapped b
 
 ### Consumable Media Types
 
-You can narrow the request mapping based on the `Content-Type` of the request:
+You can narrow down the request mapping based on the `Content-Type` of the request:
 
 ```java
 @PostMapping(path = "/items", consumes = "application/json") 
@@ -509,7 +546,7 @@ public Item getItem(@PathVariable(name = "itemId") String itemId) {
 ```
 
  Negated expressions are also supported — for example, `!text/plain` means any content type other than `text/plain`.
-You can declare a shared `produces~ attribute at the class level. However, when used at the class level, a method-level produces attribute overrides rather than extends the class-level declaration.
+You can declare a shared `produces` attribute at the class level. However, when used at the class level, a method-level produces attribute overrides rather than extends the class-level declaration.
 
 ### Parameters & Headers
 
@@ -560,9 +597,8 @@ The following example shows how to do so:
 public class EditItemForm {
 
  @GetMapping
- public String setupForm(@RequestParam("itemId") int itemId, Model model) { 
+ public String setupForm(@RequestParam("myParam") String myParam) { 
   // ...
-  return "itemForm";
  }
 }
 ```
@@ -586,9 +622,8 @@ The following example gets the value of the Accept-Encoding and Keep-Alive heade
 
 ```java
 @GetMapping("/request-header")
-public void handle(
-  @RequestHeader("Accept-Encoding") String encoding, 
-  @RequestHeader("Keep-Alive") long keepAlive) { 
+public void handle(@RequestHeader("Accept-Encoding") String encoding, 
+                   @RequestHeader("Keep-Alive") long keepAlive) { 
  //...
 }
 ```
@@ -639,7 +674,7 @@ public Account handle() {
 
 ##### HttpEntity
 
-HttpEntity is more or less identical to using mvc-ann-requestbody but is based on a container object that exposes request headers and body.
+HttpEntity is more or less identical to using @ResponseBody but is based on a container object that exposes request headers and body.
 
 ```java
 @PostMapping("/accounts")
@@ -768,7 +803,7 @@ It is generally recommended that you are as specific as possible in the argument
 Typically `@ExceptionHandler` and `@ModelAttribute` methods apply within the `@Controller` class (or class hierarchy) in which they are declared. If you want such methods to apply more globally (across controllers), you can declare them in a class annotated with `@ControllerAdvice` or `@RestControllerAdvice`.
 `@ControllerAdvice` is annotated with @Component, which means such classes can be registered as Spring beans through component scanning.
 
-On startup, the infrastructure classes for `@RequestMapping` and `@ExceptionHandler` methods detect Spring beans annotated with `@ControllerAdvice` and then apply their methods at runtime. Global `@ExceptionHandler` methods (from a `@ControllerAdvice`) are applied after local ones (from the `@Controller`). By contrast global `@ModelAttribute` methods are applied before local ones.
+On startup, the infrastructure classes for `@RequestMapping` and `@ExceptionHandler` methods detect Spring beans annotated with `@ControllerAdvice` and then apply their methods at runtime. Global `@ExceptionHandler` methods (from a `@ControllerAdvice`) are applied after local ones (from the `@Controller`).
 
 By default, `@ControllerAdvice` methods apply to every request (that is, all controllers), but you can narrow that down to a subset of controllers by using attributes on the annotation, as the following example shows:
 
@@ -842,7 +877,7 @@ RouterFunction<ServerResponse> route = route()
  .build();
 
 
-public class PersonHandler {
+public class ItemHandler {
 
  // ...
 
