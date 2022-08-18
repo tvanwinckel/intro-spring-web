@@ -1006,12 +1006,6 @@ URI uri = uriComponents.encode().toUri();
 
 ---
 
-## Cors
-
-TBD
-
----
-
 ## Sources and Information
 
 * [Spring Documentation](https://spring.getdocs.org/en-US/spring-framework-docs/docs/spring-web/spring-web.html)
